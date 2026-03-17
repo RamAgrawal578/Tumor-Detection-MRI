@@ -6,12 +6,19 @@ from PIL import Image
 from tensorflow import keras
 from werkzeug.utils import secure_filename
 
-from src.config import CLASS_NAMES_PATH, IMG_SIZE, MODEL_PATH
+from src.config import IMG_SIZE
 from src.utils import load_class_names, preprocess_pil_image
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
-UPLOAD_FOLDER = "static/uploads"
+# 🔥 BASE DIRECTORY FIX (IMPORTANT)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 🔥 FIXED PATHS (ABSOLUTE)
+MODEL_PATH = os.path.join(BASE_DIR, "models", "brain_tumor_classifier.keras")
+CLASS_NAMES_PATH = os.path.join(BASE_DIR, "models", "class_names.json")
+
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -27,30 +34,32 @@ def prettify_label(label: str) -> str:
 
 
 def load_assets():
+    # 🔥 Load model using absolute path
     model = keras.models.load_model(MODEL_PATH)
-    class_names = load_class_names()
+    class_names = load_class_names(CLASS_NAMES_PATH)
     return model, class_names
 
 
+# 🔥 LOAD ON START
 model, class_names = load_assets()
 
 
 @app.route("/")
 def home():
-    if not MODEL_PATH.exists() or not CLASS_NAMES_PATH.exists():
+    if not os.path.exists(MODEL_PATH) or not os.path.exists(CLASS_NAMES_PATH):
         return (
-            "Model files are missing. Train the model first so models/ contains "
-            "the saved model and class_names.json."
+            "Model files are missing. Ensure models/ contains "
+            "brain_tumor_classifier.keras and class_names.json"
         )
     return render_template("index.html")
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    if not MODEL_PATH.exists() or not CLASS_NAMES_PATH.exists():
+    if not os.path.exists(MODEL_PATH) or not os.path.exists(CLASS_NAMES_PATH):
         return (
-            "Model files are missing. Train the model first so models/ contains "
-            "the saved model and class_names.json."
+            "Model files are missing. Ensure models/ contains "
+            "brain_tumor_classifier.keras and class_names.json"
         )
 
     if "file" not in request.files:
@@ -67,8 +76,9 @@ def predict():
     original_name = secure_filename(file.filename)
     ext = original_name.rsplit(".", 1)[1].lower()
     unique_name = f"{uuid.uuid4().hex}.{ext}"
-    relative_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_name)
-    absolute_path = os.path.join(app.root_path, relative_path)
+
+    relative_path = os.path.join("static", "uploads", unique_name)
+    absolute_path = os.path.join(BASE_DIR, relative_path)
 
     os.makedirs(os.path.dirname(absolute_path), exist_ok=True)
     file.save(absolute_path)

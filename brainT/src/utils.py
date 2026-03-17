@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Iterable
 
@@ -26,8 +27,22 @@ def save_class_names(class_names: Iterable[str]) -> None:
         json.dump(list(class_names), f, indent=2)
 
 
-def load_class_names() -> list[str]:
-    with open(CLASS_NAMES_PATH, "r", encoding="utf-8") as f:
+# 🔥 FIXED FUNCTION (IMPORTANT)
+def load_class_names(path=None) -> list[str]:
+    """
+    Loads class names from JSON file.
+    Works both for training (config path) and deployment (custom path).
+    """
+    if path is None:
+        path = CLASS_NAMES_PATH
+
+    # Convert Path → string if needed
+    path = str(path)
+
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"class_names.json not found at: {path}")
+
+    with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -81,11 +96,13 @@ def plot_confusion_matrix(cm: np.ndarray, class_names: list[str]) -> Path:
     plt.imshow(cm, interpolation="nearest", cmap="Blues")
     plt.title("Confusion Matrix")
     plt.colorbar()
+
     tick_marks = np.arange(len(class_names))
     plt.xticks(tick_marks, class_names, rotation=45, ha="right")
     plt.yticks(tick_marks, class_names)
 
     threshold = cm.max() / 2.0 if cm.size else 0
+
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
             plt.text(
@@ -101,4 +118,5 @@ def plot_confusion_matrix(cm: np.ndarray, class_names: list[str]) -> Path:
     plt.tight_layout()
     plt.savefig(CONFUSION_MATRIX_PATH, dpi=150, bbox_inches="tight")
     plt.close()
+
     return CONFUSION_MATRIX_PATH
