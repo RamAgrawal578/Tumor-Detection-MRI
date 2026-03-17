@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediction Result | NeuroScan AI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --panel-soft: #f8fafc;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --muted: #64748b;
+            --accent: #2563eb;
+            --accent-soft: #dbeafe;
+            --success-bg: #ecfeff;
+            --success-border: #bae6fd;
+            --warning-bg: #fff7ed;
+            --warning-border: #fed7aa;
+            --warning-text: #9a3412;
+            --shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+            --container: 1180px;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.06), transparent 26%),
+                linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            color: var(--text);
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 28px 20px 40px;
+        }
+
+        .container {
+            width: min(100%, var(--container));
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: #0f172a;
+            color: white;
+            font-weight: 700;
+        }
+
+        .brand-copy h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .brand-copy p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .back-btn {
+            text-decoration: none;
+            background: #0f172a;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .hero {
+            margin-bottom: 22px;
+        }
+
+        .hero h2 {
+            margin: 0;
+            font-size: clamp(30px, 4vw, 48px);
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+            gap: 22px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .card h3 {
+            margin: 0 0 18px;
+            font-size: 22px;
+        }
+
+        .image-frame {
+            width: 100%;
+            min-height: 460px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            background: var(--panel-soft);
+            border: 1px solid var(--border);
+            padding: 18px;
+        }
+
+        .image-frame img {
+            width: 100%;
+            max-width: 430px;
+            max-height: 430px;
+            object-fit: contain;
+            border-radius: 18px;
+            display: block;
+        }
+
+        .filename {
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .summary-box {
+            background: var(--panel-soft);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px;
+        }
+
+        .summary-label {
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            line-height: 1.15;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .summary-pill {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .section-title {
+            margin: 0 0 16px;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .probability-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .prob-item {
+            padding: 14px 16px;
+            background: var(--panel-soft);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+        }
+
+        .prob-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .prob-label {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .prob-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .bar {
+            width: 100%;
+            height: 10px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: #e2e8f0;
+        }
+
+        .fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+        }
+
+        .note {
+            margin-top: 20px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .image-frame {
+                min-height: 320px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                padding: 16px 12px 24px;
+            }
+
+            .card {
+                padding: 18px;
+                border-radius: 22px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-value {
+                font-size: 24px;
+            }
+
+            .image-frame {
+                min-height: 260px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="container">
+            <div class="topbar">
+                <div class="brand">
+                    <div class="brand-mark">N</div>
+                    <div class="brand-copy">
+                        <h1>NeuroScan AI</h1>
+                        <p>Prediction review workspace</p>
+                    </div>
+                </div>
+
+                <a href="/" class="back-btn">Analyze Another Image</a>
+            </div>
+
+            <div class="hero">
+                <h2>Prediction Result</h2>
+                <p>
+                    Review the uploaded image, predicted class, confidence level, and the full class probability breakdown.
+                </p>
+            </div>
+
+            <div class="layout">
+                <div class="card">
+                    <h3>Uploaded MRI</h3>
+                    <div class="image-frame">
+                        <img src="/{{ image_file }}" alt="Uploaded MRI image" />
+                    </div>
+                    {% if uploaded_name %}
+                        <div class="filename">File: {{ uploaded_name }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="card">
+                    <h3>Analysis Summary</h3>
+
+                    <div class="summary-grid">
+                        <div class="summary-box">
+                            <div class="summary-label">Predicted Class</div>
+                            <div class="summary-value">{{ prediction }}</div>
+                            <div class="summary-pill">Top Prediction</div>
+                        </div>
+
+                        <div class="summary-box">
+                            <div class="summary-label">Confidence</div>
+                            <div class="summary-value">{{ confidence }}%</div>
+                            <div class="summary-pill">Model Score</div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Class Probabilities</div>
+
+                    <div class="probability-list">
+                        {% for item in probabilities %}
+                            <div class="prob-item">
+                                <div class="prob-head">
+                                    <div class="prob-label">{{ item.label }}</div>
+                                    <div class="prob-value">{{ item.percent }}%</div>
+                                </div>
+                                <div class="bar">
+                                    <div class="fill" style="width: {{ item.percent }}%"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="note">
+                        This output is generated for demonstration and educational purposes only. It is not a medical diagnosis.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
