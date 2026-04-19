@@ -11,10 +11,8 @@ from src.utils import load_class_names, preprocess_pil_image
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
-# 🔥 BASE DIRECTORY FIX (IMPORTANT)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# 🔥 FIXED PATHS (ABSOLUTE)
 MODEL_PATH = os.path.join(BASE_DIR, "models", "brain_tumor_classifier.keras")
 CLASS_NAMES_PATH = os.path.join(BASE_DIR, "models", "class_names.json")
 
@@ -29,18 +27,28 @@ def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# 🔥 STRONG LABEL CLEANER (FIXED)
 def prettify_label(label: str) -> str:
-    return str(label).replace("_", " ").replace("-", " ").title()
+    cleaned = str(label).lower().replace("-", "").replace("_", "").replace(" ", "")
+
+    if cleaned == "no-tumor":
+        return "No Tumor"
+    elif cleaned == "glioma":
+        return "Glioma"
+    elif cleaned == "meningioma":
+        return "Meningioma"
+    elif cleaned == "pituitary":
+        return "Pituitary"
+    
+    return str(label).title()
 
 
 def load_assets():
-    # 🔥 Load model using absolute path
     model = keras.models.load_model(MODEL_PATH)
     class_names = load_class_names(CLASS_NAMES_PATH)
     return model, class_names
 
 
-# 🔥 LOAD ON START
 model, class_names = load_assets()
 
 
@@ -89,9 +97,13 @@ def predict():
     raw_probabilities = model.predict(batch, verbose=0)[0]
     best_idx = int(np.argmax(raw_probabilities))
 
-    prediction = prettify_label(class_names[best_idx])
+    # 🔥 FIXED PREDICTION
+    raw_label = class_names[best_idx]
+    prediction = prettify_label(raw_label)
+
     confidence = round(float(raw_probabilities[best_idx]) * 100, 2)
 
+    # 🔥 FIXED PROBABILITY LIST
     probability_items = sorted(
         [
             {
@@ -117,4 +129,4 @@ def predict():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=True) 

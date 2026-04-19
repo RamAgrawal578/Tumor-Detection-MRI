@@ -4,41 +4,63 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prediction Result | NeuroScan AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Lora:ital,wght@0,600;1,500&display=swap" rel="stylesheet" />
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg: #f8fafc;
             --panel: #ffffff;
-            --panel-soft: #f8fafc;
-            --border: #e2e8f0;
-            --text: #0f172a;
-            --muted: #64748b;
-            --accent: #2563eb;
-            --accent-soft: #dbeafe;
-            --success-bg: #ecfeff;
-            --success-border: #bae6fd;
-            --warning-bg: #fff7ed;
-            --warning-border: #fed7aa;
-            --warning-text: #9a3412;
-            --shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+            --panel-soft: #f6f9ff;
+            --border: #dde6f5;
+            --text: #0d1b2e;
+            --muted: #4a5f7a;
+            --muted-light: #7a90aa;
+            --primary: #0d1b2e;
+            --accent: #2457e8;
+            --accent-soft: #e0e9ff;
+            --warning-bg: #fffbeb;
+            --warning-border: #fcd34d;
+            --warning-text: #92400e;
+            --shadow: 0 24px 64px rgba(13, 27, 46, 0.09);
             --container: 1180px;
         }
 
         body {
-            margin: 0;
-            font-family: Inter, Arial, sans-serif;
-            background:
-                radial-gradient(circle at top left, rgba(37, 99, 235, 0.06), transparent 26%),
-                linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            font-family: 'Outfit', sans-serif;
+            background: #f0f4fb;
             color: var(--text);
+            min-height: 100vh;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes fillBar {
+            from { width: 0%; }
+            to   { width: var(--target-width); }
+        }
+        @keyframes pulse-ring {
+            0%   { transform: scale(1);    opacity: 0.6; }
+            70%  { transform: scale(1.55); opacity: 0; }
+            100% { transform: scale(1.55); opacity: 0; }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position:  200% center; }
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .page {
-            min-height: 100vh;
-            padding: 28px 20px 40px;
+            padding: 18px 22px 40px;
+            animation: fadeIn 0.45s ease both;
         }
 
         .container {
@@ -46,328 +68,375 @@
             margin: 0 auto;
         }
 
+        /* TOPBAR */
         .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 16px;
+            margin-bottom: 24px; flex-wrap: wrap;
+            animation: fadeUp 0.45s ease 0.05s both;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .brand { display: flex; align-items: center; gap: 13px; }
 
         .brand-mark {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            display: grid;
-            place-items: center;
-            background: #0f172a;
-            color: white;
-            font-weight: 700;
+            width: 48px; height: 48px; border-radius: 15px;
+            background: var(--primary);
+            display: grid; place-items: center;
+            box-shadow: 0 8px 24px rgba(13,27,46,0.22);
         }
 
-        .brand-copy h1 {
-            margin: 0;
-            font-size: 18px;
-        }
+        .brand-mark svg { width: 26px; height: 26px; }
 
-        .brand-copy p {
-            margin: 4px 0 0;
-            font-size: 13px;
-            color: var(--muted);
-        }
+        .brand-copy h1 { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; }
+        .brand-copy p  { font-size: 13px; color: var(--muted-light); margin-top: 2px; }
 
         .back-btn {
             text-decoration: none;
-            background: #0f172a;
-            color: white;
-            padding: 12px 16px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 14px;
+            background: var(--primary); color: white;
+            padding: 11px 18px; border-radius: 14px;
+            font-weight: 700; font-size: 14px;
+            font-family: inherit;
+            display: flex; align-items: center; gap: 7px;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
 
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(13,27,46,0.2);
+        }
+
+        .back-btn svg { width: 15px; height: 15px; }
+
+        /* HERO */
         .hero {
-            margin-bottom: 22px;
+            margin-bottom: 24px;
+            animation: fadeUp 0.45s ease 0.1s both;
         }
 
         .hero h2 {
-            margin: 0;
-            font-size: clamp(30px, 4vw, 48px);
-            letter-spacing: -1px;
+            font-family: 'Lora', serif;
+            font-size: clamp(28px, 4vw, 44px);
+            letter-spacing: -0.5px;
         }
 
         .hero p {
-            margin: 12px 0 0;
-            color: var(--muted);
-            font-size: 16px;
-            line-height: 1.7;
+            margin: 10px 0 0; color: var(--muted);
+            font-size: 15px; line-height: 1.75;
         }
 
+        /* LAYOUT */
         .layout {
             display: grid;
             grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-            gap: 22px;
+            gap: 20px;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(226, 232, 240, 0.9);
+            background: rgba(255,255,255,0.93);
+            border: 1.5px solid rgba(221,230,245,0.9);
             border-radius: 28px;
             box-shadow: var(--shadow);
-            padding: 24px;
+            padding: 26px;
         }
 
-        .card h3 {
-            margin: 0 0 18px;
-            font-size: 22px;
+        .card-label {
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--muted-light); margin-bottom: 18px;
         }
+
+        /* IMAGE CARD */
+        .image-card { animation: fadeUp 0.5s ease 0.15s both; }
 
         .image-frame {
-            width: 100%;
-            min-height: 460px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 22px;
+            width: 100%; min-height: 440px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 20px;
             background: var(--panel-soft);
-            border: 1px solid var(--border);
-            padding: 18px;
+            border: 1.5px solid var(--border);
+            padding: 16px; overflow: hidden;
+            position: relative;
         }
 
         .image-frame img {
-            width: 100%;
-            max-width: 430px;
-            max-height: 430px;
-            object-fit: contain;
-            border-radius: 18px;
-            display: block;
+            width: 100%; max-width: 420px; max-height: 420px;
+            object-fit: contain; border-radius: 14px; display: block;
+            transition: transform 0.3s ease;
         }
 
+        .image-frame:hover img { transform: scale(1.02); }
+
         .filename {
-            margin-top: 14px;
-            color: var(--muted);
-            font-size: 14px;
-            word-break: break-word;
+            margin-top: 14px; color: var(--muted-light);
+            font-size: 13px; word-break: break-word;
+            display: flex; align-items: center; gap: 6px;
         }
+
+        .filename svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+        /* RESULTS CARD */
+        .results-card { animation: fadeUp 0.5s ease 0.2s both; }
 
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            margin-bottom: 22px;
+            gap: 14px; margin-bottom: 22px;
         }
 
         .summary-box {
             background: var(--panel-soft);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 18px;
+            border: 1.5px solid var(--border);
+            border-radius: 20px; padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .summary-box:hover { transform: translateY(-2px); }
+
+        .summary-box.highlight {
+            background: #eff6ff; border-color: #bfdbfe;
         }
 
         .summary-label {
-            margin-bottom: 10px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-            color: var(--muted);
-            font-weight: 700;
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.8px; color: var(--muted-light);
+            font-weight: 700; margin-bottom: 10px;
         }
 
         .summary-value {
-            font-size: 28px;
-            line-height: 1.15;
-            font-weight: 800;
-            color: var(--text);
+            font-size: 28px; font-weight: 800;
+            color: var(--text); line-height: 1.1;
+            animation: countUp 0.5s ease 0.3s both;
         }
 
-        .summary-pill {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 8px 12px;
+        .summary-box.highlight .summary-value { color: var(--accent); }
+
+        .summary-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 10px; padding: 5px 11px;
             border-radius: 999px;
-            background: var(--accent-soft);
-            color: var(--accent);
-            font-size: 13px;
-            font-weight: 700;
+            background: var(--accent-soft); color: var(--accent);
+            font-size: 12px; font-weight: 700;
         }
 
-        .section-title {
-            margin: 0 0 16px;
-            font-size: 18px;
-            font-weight: 800;
+        .summary-badge-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent); position: relative;
         }
 
-        .probability-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        .summary-badge-dot::after {
+            content: '';
+            position: absolute; inset: -2px; border-radius: 50%;
+            border: 2px solid var(--accent);
+            animation: pulse-ring 1.8s ease infinite;
         }
+
+        /* PROB LIST */
+        .prob-section-title {
+            font-size: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.7px;
+            color: var(--muted-light); margin-bottom: 12px;
+        }
+
+        .probability-list { display: flex; flex-direction: column; gap: 10px; }
 
         .prob-item {
             padding: 14px 16px;
             background: var(--panel-soft);
-            border: 1px solid var(--border);
-            border-radius: 18px;
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            transition: transform 0.18s ease, border-color 0.18s ease;
+        }
+
+        .prob-item:hover {
+            transform: translateX(3px);
+            border-color: #b8caed;
+        }
+
+        .prob-item.top-pred {
+            background: #eff6ff; border-color: #bfdbfe;
         }
 
         .prob-head {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 10px;
-            align-items: center;
+            display: flex; justify-content: space-between;
+            gap: 12px; margin-bottom: 10px; align-items: center;
         }
 
-        .prob-label {
-            font-size: 15px;
-            font-weight: 700;
+        .prob-label-wrap { display: flex; align-items: center; gap: 8px; }
+
+        .prob-dot {
+            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
         }
 
-        .prob-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent);
-        }
+        .prob-label { font-size: 14px; font-weight: 700; }
+
+        .prob-value { font-size: 13px; font-weight: 700; color: var(--accent); }
 
         .bar {
-            width: 100%;
-            height: 10px;
-            border-radius: 999px;
-            overflow: hidden;
-            background: #e2e8f0;
+            width: 100%; height: 8px; border-radius: 999px;
+            overflow: hidden; background: #e2e8f0;
         }
 
         .fill {
-            height: 100%;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            height: 100%; border-radius: 999px;
+            background: linear-gradient(90deg, #2457e8, #60a5fa);
+            width: 0%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* NOTE */
         .note {
-            margin-top: 20px;
-            padding: 16px 18px;
-            border-radius: 18px;
+            margin-top: 16px; padding: 13px 16px;
+            border-radius: 14px;
             background: var(--warning-bg);
             border: 1px solid var(--warning-border);
             color: var(--warning-text);
-            font-size: 14px;
-            line-height: 1.65;
+            font-size: 12.5px; line-height: 1.65;
+            display: flex; gap: 9px; align-items: flex-start;
         }
 
-        @media (max-width: 980px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
+        .note-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
 
-            .image-frame {
-                min-height: 320px;
-            }
+        /* RESPONSIVE */
+        @media (max-width: 980px) {
+            .layout { grid-template-columns: 1fr; }
+            .image-frame { min-height: 300px; }
         }
 
         @media (max-width: 640px) {
-            .page {
-                padding: 16px 12px 24px;
-            }
-
-            .card {
-                padding: 18px;
-                border-radius: 22px;
-            }
-
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .summary-value {
-                font-size: 24px;
-            }
-
-            .image-frame {
-                min-height: 260px;
-                padding: 12px;
-            }
+            .page { padding: 14px 12px 28px; }
+            .card { padding: 18px; border-radius: 22px; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .summary-value { font-size: 24px; }
+            .image-frame { min-height: 240px; padding: 12px; }
         }
     </style>
 </head>
 <body>
     <div class="page">
         <div class="container">
+
+            <!-- TOPBAR -->
             <div class="topbar">
                 <div class="brand">
-                    <div class="brand-mark">N</div>
+                    <div class="brand-mark">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9.5 2a3.5 3.5 0 0 0-3.5 3.5v.1A3.5 3.5 0 0 0 2 9c0 1.4.82 2.6 2 3.17V14a5 5 0 0 0 5 5h6a5 5 0 0 0 5-5v-1.83A3.5 3.5 0 0 0 22 9a3.5 3.5 0 0 0-3.5-3.4A3.5 3.5 0 0 0 15 2a3.5 3.5 0 0 0-3 1.7A3.5 3.5 0 0 0 9.5 2z"/>
+                            <path d="M12 2v17M8 7h1M15 7h1M8 11h1M15 11h1"/>
+                        </svg>
+                    </div>
                     <div class="brand-copy">
                         <h1>NeuroScan AI</h1>
-                        <p>Prediction review workspace</p>
+                        <p>Brain MRI Classification Interface</p>
                     </div>
                 </div>
 
-                <a href="/" class="back-btn">Analyze Another Image</a>
+                <a href="/" class="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                    Classify Another Image
+                </a>
             </div>
 
+            <!-- HERO -->
             <div class="hero">
-                <h2>Prediction Result</h2>
-                <p>
-                    Review the uploaded image, predicted class, confidence level, and the full class probability breakdown.
-                </p>
+                <h2>Classification Result</h2>
+                <p>MRI scan analysed. Below is the predicted class and confidence score across all four categories.</p>
             </div>
 
+            <!-- LAYOUT -->
             <div class="layout">
-                <div class="card">
-                    <h3>Uploaded MRI</h3>
+
+                <!-- IMAGE CARD -->
+                <div class="card image-card">
+                    <div class="card-label">Uploaded MRI Scan</div>
                     <div class="image-frame">
                         <img src="/{{ image_file }}" alt="Uploaded MRI image" />
                     </div>
                     {% if uploaded_name %}
-                        <div class="filename">File: {{ uploaded_name }}</div>
+                        <div class="filename">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            {{ uploaded_name }}
+                        </div>
                     {% endif %}
                 </div>
 
-                <div class="card">
-                    <h3>Analysis Summary</h3>
+                <!-- RESULTS CARD -->
+                <div class="card results-card">
+                    <div class="card-label">Analysis Output</div>
 
                     <div class="summary-grid">
-                        <div class="summary-box">
+                        <div class="summary-box highlight">
                             <div class="summary-label">Predicted Class</div>
                             <div class="summary-value">{{ prediction }}</div>
-                            <div class="summary-pill">Top Prediction</div>
+                            <div class="summary-badge">
+                                <span class="summary-badge-dot"></span>
+                                Top Prediction
+                            </div>
                         </div>
 
                         <div class="summary-box">
-                            <div class="summary-label">Confidence</div>
+                            <div class="summary-label">Confidence Score</div>
                             <div class="summary-value">{{ confidence }}%</div>
-                            <div class="summary-pill">Model Score</div>
+                            <div class="summary-badge" style="background:#edf7f0; color:#16a34a;">
+                                Model Score
+                            </div>
                         </div>
                     </div>
 
-                    <div class="section-title">Class Probabilities</div>
+                    <div class="prob-section-title">Class Probabilities</div>
 
                     <div class="probability-list">
                         {% for item in probabilities %}
-                            <div class="prob-item">
+                            <div class="prob-item {% if loop.first %}top-pred{% endif %}" data-percent="{{ item.percent }}">
                                 <div class="prob-head">
-                                    <div class="prob-label">{{ item.label }}</div>
+                                    <div class="prob-label-wrap">
+                                        {% if loop.first %}
+                                            <span class="prob-dot" style="background:#2457e8; box-shadow: 0 0 0 3px rgba(36,87,232,0.15);"></span>
+                                        {% else %}
+                                            <span class="prob-dot" style="background:#cbd5e1;"></span>
+                                        {% endif %}
+                                        <div class="prob-label">{{ item.label }}</div>
+                                    </div>
                                     <div class="prob-value">{{ item.percent }}%</div>
                                 </div>
                                 <div class="bar">
-                                    <div class="fill" style="width: {{ item.percent }}%"></div>
+                                    <div class="fill"></div>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
 
                     <div class="note">
-                        This output is generated for demonstration and educational purposes only. It is not a medical diagnosis.
+                        <span class="note-icon">⚠️</span>
+                        <span>For educational and research purposes only. This output does not constitute a clinical diagnosis.</span>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
+
+    <script>
+        // Animate bars on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.prob-item').forEach((item, i) => {
+                const percent = item.dataset.percent;
+                const fill = item.querySelector('.fill');
+                setTimeout(() => {
+                    fill.style.width = percent + '%';
+                }, 200 + i * 120);
+            });
+        });
+
+        // Stagger prob items entrance
+        document.querySelectorAll('.prob-item').forEach((item, i) => {
+            item.style.opacity = '0';
+            item.style.animation = `fadeUp 0.35s ease ${0.25 + i * 0.09}s both`;
+        });
+    </script>
 </body>
 </html>
