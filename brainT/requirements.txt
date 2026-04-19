@@ -6,3 +6,4 @@ Pillow==10.4.0
 Werkzeug==3.0.3
 h5py==3.16.0
 opencv-python-headless
+streamlit
